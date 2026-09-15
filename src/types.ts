@@ -115,6 +115,14 @@ export enum AppTab {
   SETTINGS = 'SETTINGS',
 }
 
+export enum ShopTool {
+  SPEEDS_FEEDS = 'SPEEDS_FEEDS',
+  DRILL_CHART = 'DRILL_CHART',
+  TAP_CHART = 'TAP_CHART',
+  FORM_TAP_CHART = 'FORM_TAP_CHART',
+  STI_CHART = 'STI_CHART',
+}
+
 export enum BackupInterval {
   OFF = 'OFF',
   DAILY = 'DAILY',

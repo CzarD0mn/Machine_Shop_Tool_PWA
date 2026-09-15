@@ -11,7 +11,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab }) => {
   const subtitle = React.useMemo(() => {
     switch (currentTab) {
       case AppTab.FEEDS:
-        return "Speeds, feeds, and shop notes";
+        return "Shop tools for the cell";
       case AppTab.LOG:
         return "Track setup and production by job";
       case AppTab.PROGRAMS:

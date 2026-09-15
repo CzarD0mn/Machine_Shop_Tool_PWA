@@ -124,7 +124,7 @@ export function OfflinePanel({
       setNote(
         count
           ? `Shop cache packed · ${count} files on this device`
-          : "Cache armed. Open Calc once while online, then this phone will run on the floor with no signal.",
+          : "Cache armed. Open Tools once while online, then this phone will run on the floor with no signal.",
       );
     } catch (error) {
       setNote(error instanceof Error ? error.message : "Could not pack the cache");

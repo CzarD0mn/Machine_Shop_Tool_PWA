@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AppTab, BackupPayload, OperationEntry, ProgramEntry, StartTabChoice, TextScale } from './types';
 import { Header } from './components/Header';
 import { BottomBar } from './components/BottomBar';
-import { CalcTab } from './components/CalcTab';
+import { ToolsTab } from './components/ToolsTab';
 import { OpLogTab } from './components/OpLogTab';
 import { ProgramsTab } from './components/ProgramsTab';
 import { SettingsTab } from './components/SettingsTab';
@@ -154,7 +154,7 @@ export function App() {
       <PwaRuntime />
 
       <main className="flex-1 overflow-x-hidden">
-        {currentTab === AppTab.FEEDS && <CalcTab />}
+        {currentTab === AppTab.FEEDS && <ToolsTab />}
         {currentTab === AppTab.LOG && (
           <OpLogTab
             entries={operations}

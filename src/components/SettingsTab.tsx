@@ -353,7 +353,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               { id: StartTabChoice.LAST, label: 'Last used' },
               { id: StartTabChoice.LOG, label: 'Op Log' },
               { id: StartTabChoice.PROGRAMS, label: 'Programs' },
-              { id: StartTabChoice.CALC, label: 'Calc' },
+              { id: StartTabChoice.CALC, label: 'Tools' },
               { id: StartTabChoice.SETTINGS, label: 'Settings' },
             ].map((opt) => (
               <button

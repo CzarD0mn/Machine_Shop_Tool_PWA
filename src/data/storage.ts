@@ -8,6 +8,7 @@ import {
   ProgramEntry,
   RemoteProtocol,
   RemoteTarget,
+  ShopTool,
   StartTabChoice,
   TextScale,
 } from "../types";
@@ -119,6 +120,7 @@ export interface UxPrefsData {
   textScale: TextScale;
   startTab: StartTabChoice;
   lastTab: string;
+  lastShopTool: ShopTool;
   outdoorGreen: boolean;
   compactPhone: boolean;
 }
@@ -127,6 +129,7 @@ const DEFAULT_UX: UxPrefsData = {
   textScale: TextScale.NORMAL,
   startTab: StartTabChoice.LAST,
   lastTab: "FEEDS",
+  lastShopTool: ShopTool.SPEEDS_FEEDS,
   outdoorGreen: false,
   compactPhone: false,
 };
