@@ -4,6 +4,31 @@ Speeds-and-feeds calculator, named operation log, program log, and backup manage
 
 Rewritten in modern React + TypeScript with Tailwind CSS from the original Android application, fully preserving all cutting math, shop materials, time stamp tracking, averages calculations, Web Crypto AES-GCM backup encryption, and responsive split-pane layouts.
 
+## Native Android app
+
+The Machinist Helper ships as a **Capacitor Android app** (`com.machinisthelper.app`) wrapping this PWA in a native WebView with a shop-green splash and status bar.
+
+### Install the APK
+
+1. Download `app-debug.apk` from [Releases](https://github.com/CzarD0mn/Machine_Shop_Tool_PWA/releases) or the latest [Actions artifact](https://github.com/CzarD0mn/Machine_Shop_Tool_PWA/actions/workflows/build-apk.yml).
+2. Copy it to an Android 7+ phone or tablet.
+3. Open the file and allow install from this source if Android asks.
+4. Launch **The Machinist Helper** from the app drawer.
+
+Every push to `main` rebuilds the APK. Use **Actions → Build Android APK → Run workflow** for an on-demand build.
+
+### Build locally
+
+```bash
+npm install
+npm run build
+npx cap add android          # first time only
+npx cap sync android
+cd android && ./gradlew assembleDebug
+```
+
+The debug APK lands at `android/app/build/outputs/apk/debug/app-debug.apk`.
+
 ## Features
 
 ### 1. Speeds & Feeds Calculator (`Calc` tab)

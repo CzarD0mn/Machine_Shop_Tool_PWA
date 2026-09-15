@@ -15,6 +15,7 @@ import {
   UxPrefsData,
 } from './data/storage';
 import { scheduleRemoteBackupEnqueue } from './lib/remote-sync';
+import { bootNativeAndroid } from './lib/native';
 
 // Initial sample jobs so shop machinists can immediately see real-world workflow
 const SAMPLE_OPERATIONS: OperationEntry[] = [
@@ -97,6 +98,10 @@ export function App() {
     if (Object.values(AppTab).includes(last)) return last;
     return AppTab.FEEDS;
   });
+
+  useEffect(() => {
+    void bootNativeAndroid();
+  }, []);
 
   // Apply theme classes to body
   useEffect(() => {

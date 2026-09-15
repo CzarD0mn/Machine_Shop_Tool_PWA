@@ -2,8 +2,12 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main, master, test]
+    branches: [main, master, test, native-android]
   workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
   build:
@@ -17,7 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci || npm install
@@ -28,8 +32,8 @@ jobs:
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: temurin
+          java-version: "21"
 
       - name: Accept Android SDK Licenses
         run: |
@@ -37,28 +41,46 @@ jobs:
 
       - name: Build Android App using Capacitor
         run: |
-          npm install --save-dev @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "The Machinist Helper" "com.machinisthelper.app" --web-dir "dist"
+          npm install --save @capacitor/core @capacitor/android @capacitor/status-bar @capacitor/app @capacitor/splash-screen
+          npm install --save-dev @capacitor/cli
+
+          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
+            npx cap init "The Machinist Helper" "com.machinisthelper.app" --web-dir "dist"
+          fi
+
           npx cap add android
           echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-          # Fix duplicate Kotlin stdlib classes (kotlin-stdlib-jdk7 / jdk8 merged into kotlin-stdlib in Kotlin 1.8+)
+          # Native chrome: shop-green status bar and splash
+          python3 - <<'PY'
+          from pathlib import Path
+          styles = Path("android/app/src/main/res/values/styles.xml")
+          if styles.exists():
+              text = styles.read_text()
+              text = text.replace("#FFFFFF", "#2E7D32").replace("#ffffff", "#2E7D32")
+              styles.write_text(text)
+          manifest = Path("android/app/src/main/AndroidManifest.xml")
+          if manifest.exists():
+              text = manifest.read_text()
+              if "usesCleartextTraffic" not in text:
+                  text = text.replace(
+                      "<application",
+                      '<application android:usesCleartextTraffic="true"',
+                      1,
+                  )
+              manifest.write_text(text)
+          PY
+
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi android/app/src/main/res/mipmap-xxhdpi
+          cp public/pwa-512x512.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png || true
+          cp public/pwa-512x512.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png || true
+          cp public/pwa-192x192.png android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png || true
+
           cat << 'EOF' >> android/app/build.gradle
 
           configurations.all {
               exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
               exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
-          }
-
-          dependencies {
-              constraints {
-                  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22") {
-                      because("kotlin-stdlib-jdk7 classes are already in kotlin-stdlib")
-                  }
-                  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22") {
-                      because("kotlin-stdlib-jdk8 classes are already in kotlin-stdlib")
-                  }
-              }
           }
           EOF
 
@@ -82,3 +104,14 @@ jobs:
         with:
           name: machinist-helper-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish GitHub Release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/native-android'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-${{ github.run_number }}
+          name: Machinist Helper Android ${{ github.run_number }}
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ github.ref != 'refs/heads/main' }}
