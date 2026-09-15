@@ -70,6 +70,11 @@ Rewritten in modern React + TypeScript with Tailwind CSS from the original Andro
   - Custom SSL/TLS certificate pinning (`.crt` / `.pem`).
 - **Error History**:
   - View and export operational diagnostic logs.
+- **Shop Offline & Background Sync**:
+  - Custom service worker caches Calc, logs, and backups for dead-cell use.
+  - Silent reachability probe restores network services when signal returns.
+  - Nextcloud / WebDAV backups queue into the Background Sync API and flush even if the tab is closed.
+  - Daily / Weekly schedules arm Periodic Sync on installed home-screen installs.
 
 ## Math Engine
 
@@ -87,4 +92,5 @@ Metric units convert seamlessly:
 - **Styling**: Tailwind CSS with custom machinist shop green themes
 - **Icons**: Lucide React
 - **Data Persistence**: LocalStorage with Web Crypto API (`SubtleCrypto` AES-256-GCM / PBKDF2 / SHA-256)
+- **Offline**: Custom service worker + Cache API, Background Sync, and Periodic Sync
 - **Compression**: JSZip for `.mhb` and `.zip` archive creation and extraction

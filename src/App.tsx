@@ -7,12 +7,14 @@ import { OpLogTab } from './components/OpLogTab';
 import { ProgramsTab } from './components/ProgramsTab';
 import { SettingsTab } from './components/SettingsTab';
 import { OfflineIndicator } from './components/OfflineIndicator';
+import { PwaRuntime } from './components/PwaRuntime';
 import {
   OperationLogStore,
   ProgramLogStore,
   UxPrefs,
   UxPrefsData,
 } from './data/storage';
+import { scheduleRemoteBackupEnqueue } from './lib/remote-sync';
 
 // Initial sample jobs so shop machinists can immediately see real-world workflow
 const SAMPLE_OPERATIONS: OperationEntry[] = [
@@ -117,11 +119,13 @@ export function App() {
   const handleSaveOperations = (newOps: OperationEntry[]) => {
     setOperations(newOps);
     OperationLogStore.saveAll(newOps);
+    scheduleRemoteBackupEnqueue();
   };
 
   const handleSavePrograms = (newProgs: ProgramEntry[]) => {
     setPrograms(newProgs);
     ProgramLogStore.saveAll(newProgs);
+    scheduleRemoteBackupEnqueue();
   };
 
   const handleUpdateUxPrefs = (patch: Partial<UxPrefsData>) => {
@@ -142,11 +146,12 @@ export function App() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${
-        uxPrefs.compactPhone ? 'px-0' : ''
+      className={`flex min-h-dvh flex-col bg-[#F7FBF7] pb-[calc(4.5rem+env(safe-area-inset-bottom))] ${
+        uxPrefs.compactPhone ? "px-0" : ""
       }`}
     >
       <Header currentTab={currentTab} />
+      <PwaRuntime />
 
       <main className="flex-1 overflow-x-hidden">
         {currentTab === AppTab.FEEDS && <CalcTab />}

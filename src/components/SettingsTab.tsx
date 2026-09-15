@@ -39,6 +39,9 @@ import {
   Server,
   Trash2,
 } from 'lucide-react';
+import { OfflinePanel } from './OfflinePanel';
+import { enqueueRemoteBackup, testRemoteTarget } from '../lib/remote-sync';
+import { armPeriodicShopSync } from '../lib/pwa';
 
 interface SettingsTabProps {
   operations: OperationEntry[];
@@ -235,28 +238,36 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
     setStatusMessage('Error history cleared');
   };
 
-  const handleTestRemote = () => {
+  const handleTestRemote = async () => {
     if (!remoteTarget.host) {
       setStatusMessage('Enter a server URL first');
       return;
     }
-    // Validate target format
     try {
-      new URL(remoteTarget.host);
+      new URL(remoteTarget.host.includes('://') ? remoteTarget.host : `https://${remoteTarget.host}`);
     } catch (_) {
       setStatusMessage('Server URL must include protocol (e.g. https://cloud.shop.local)');
       return;
     }
 
-    const updated = {
-      ...remoteTarget,
-      verified: true,
-      enabled: true,
-      lastCheck: `Verified at ${new Date().toLocaleTimeString()}`,
-    };
-    RemoteBackupPrefs.save(updated);
-    setRemoteTarget(updated);
-    setStatusMessage('Remote verified');
+    try {
+      const check = await testRemoteTarget(remoteTarget);
+      const updated = {
+        ...remoteTarget,
+        verified: true,
+        enabled: true,
+        lastCheck: check,
+      };
+      RemoteBackupPrefs.save(updated);
+      setRemoteTarget(updated);
+      setStatusMessage('Remote verified · will resume automatically when back online');
+      void enqueueRemoteBackup({ force: true });
+    } catch (err: any) {
+      const msg = err.message || 'Remote login failed';
+      setStatusMessage(msg);
+      ErrorHistoryStore.record('remote', 'CREDENTIALS', msg);
+      setErrors(ErrorHistoryStore.load());
+    }
   };
 
   const handleCertPicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -284,7 +295,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       <div>
         <h2 className="text-xl font-bold text-[#1B2E1C]">Settings</h2>
         <p className="text-xs text-[#4A5B4B]">
-          App appearance, data backups, and remote synchronization
+          Offline cache, appearance, data backups, and remote sync
         </p>
       </div>
 
@@ -422,6 +433,11 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         </div>
       </section>
 
+      <OfflinePanel
+        operationCount={operations.length}
+        programCount={programs.length}
+      />
+
       {/* SECTION 2: Backup & Restore */}
       <section className="bg-white rounded-xl border border-[#B7C9B8] p-5 shadow-xs space-y-4">
         <div>
@@ -541,6 +557,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
                   const updated = BackupPrefs.save({ interval: opt.id });
                   setBackupPrefs(updated);
                   setStatusMessage(`Scheduled backup set to: ${opt.label}`);
+                  void navigator.serviceWorker
+                    ?.ready
+                    .then((reg) => armPeriodicShopSync(reg, opt.id));
+                  if (opt.id !== BackupInterval.OFF) {
+                    void enqueueRemoteBackup({ force: true });
+                  }
                 }}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                   backupPrefs.interval === opt.id
@@ -607,7 +629,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             Remote Push
           </h3>
           <p className="text-xs text-[#4A5B4B] mt-0.5">
-            Synchronize backups to Nextcloud, WebDAV, or secure FTPS shop servers.
+            Synchronize backups to Nextcloud or WebDAV. Offline work queues, then
+            pushes by itself when this device is back on the shop network.
           </p>
         </div>
 
