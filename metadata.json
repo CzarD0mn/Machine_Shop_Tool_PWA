@@ -1,0 +1,6 @@
+{
+  "name": "The Machinist Helper",
+  "description": "Shop-floor speeds and feeds calculator, named operation log, program log, and backup manager.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

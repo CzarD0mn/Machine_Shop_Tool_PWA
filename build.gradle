@@ -1,0 +1,7 @@
+task assembleDebug(type: Exec) {
+    commandLine 'npm', 'run', 'build'
+}
+
+task build {
+    dependsOn assembleDebug
+}
