@@ -29,6 +29,19 @@ cd android && ./gradlew assembleDebug
 
 The debug APK lands at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
+### Android permissions
+
+The Capacitor template only declares `INTERNET`. The APK patch adds:
+
+| Permission / flag | Why |
+| --- | --- |
+| `INTERNET` | Nextcloud / WebDAV backup |
+| `ACCESS_NETWORK_STATE` | Offline badge and auto-resume |
+| `usesCleartextTraffic` + user CA trust | Shop LAN HTTP and self-signed certs |
+| `allowBackup="false"` | Remote passwords stay on the device |
+
+Camera, microphone, location, notifications, and shared-storage access are **not** requested. Backup restore uses the system file picker (SAF).
+
 ## Features
 
 ### 1. Speeds & Feeds Calculator (`Calc` tab)

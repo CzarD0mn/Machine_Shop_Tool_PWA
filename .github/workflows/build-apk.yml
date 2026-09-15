@@ -59,17 +59,9 @@ jobs:
               text = styles.read_text()
               text = text.replace("#FFFFFF", "#2E7D32").replace("#ffffff", "#2E7D32")
               styles.write_text(text)
-          manifest = Path("android/app/src/main/AndroidManifest.xml")
-          if manifest.exists():
-              text = manifest.read_text()
-              if "usesCleartextTraffic" not in text:
-                  text = text.replace(
-                      "<application",
-                      '<application android:usesCleartextTraffic="true"',
-                      1,
-                  )
-              manifest.write_text(text)
           PY
+
+          python3 scripts/patch-android-manifest.py android
 
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi android/app/src/main/res/mipmap-xxhdpi
           cp public/pwa-512x512.png android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png || true
