@@ -42,6 +42,22 @@ The Capacitor template only declares `INTERNET`. The APK patch adds:
 
 Camera, microphone, location, notifications, and shared-storage access are **not** requested. Backup restore uses the system file picker (SAF).
 
+### Scoped storage (Android 10+)
+
+The app does **not** write `/sdcard/Documents` or the disk root. Those APIs fail on Android 11 without `MANAGE_EXTERNAL_STORAGE`.
+
+| Lane | Used | Why |
+| --- | --- | --- |
+| `Directory.Data` (`…/files/MachinistHelper`) | Yes | Automatic backup copies. No permission. Wiped on uninstall. |
+| Storage Access Framework | Yes | Restore zip via the system picker |
+| FileProvider + Share | Yes | Copy a backup onto USB, Drive, or Bluetooth |
+| Public Documents / shared disk | No | Blocked or Play-restricted under scoped storage |
+
+Chrome's `showDirectoryPicker` is not available in Android WebView. On the phone, **Pick folder** binds to the app files folder.
+
+The CI build installs `@capacitor/filesystem` and `@capacitor/share`, and overwrites `res/xml/file_paths.xml` so FileProvider can share `files-path`.
+
+
 ## Features
 
 ### 1. Speeds & Feeds Calculator (`Calc` tab)

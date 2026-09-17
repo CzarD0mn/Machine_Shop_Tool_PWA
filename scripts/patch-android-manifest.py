@@ -12,6 +12,10 @@ src_nsc = Path("native/network_security_config.xml")
 if src_nsc.exists():
     (xml_dir / "network_security_config.xml").write_text(src_nsc.read_text())
 
+src_paths = Path("native/file_paths.xml")
+if src_paths.exists():
+    (xml_dir / "file_paths.xml").write_text(src_paths.read_text())
+
 text = manifest_path.read_text()
 
 perms = [

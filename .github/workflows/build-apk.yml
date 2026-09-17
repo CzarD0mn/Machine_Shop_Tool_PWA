@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Android App using Capacitor
         run: |
-          npm install --save @capacitor/core @capacitor/android @capacitor/status-bar @capacitor/app @capacitor/splash-screen
+          npm install --save @capacitor/core @capacitor/android @capacitor/status-bar @capacitor/app @capacitor/splash-screen @capacitor/filesystem @capacitor/share
           npm install --save-dev @capacitor/cli
 
           if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
